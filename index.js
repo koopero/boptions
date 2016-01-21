@@ -136,6 +136,8 @@ function boptions() {
         value = def['default']
       }
 
+      value = typeApply( def['type'], value )
+
       result[key] = value
     })
 
@@ -183,4 +185,23 @@ function typeMatches( type, arg ) {
   }
 
   return true
+}
+
+function typeApply( type, arg ) {
+  if ( _.isString( type ) ) {
+    switch ( type ) {
+      case 'string':
+        return String( arg )
+      break
+
+      case 'float':
+      case 'number':
+        return parseFloat( arg )
+
+      case 'int':
+        return parseInt( arg )
+    }
+  }
+
+  return arg
 }

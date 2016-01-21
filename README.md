@@ -4,11 +4,9 @@ This module is under development. Check back later.
 
 # Example
 
-This doesn't work yet.
-
 ```js
 MyFunc.options = boptions( {
-  '#linear': [ 'hostname', 'port' ],
+  '#inline': [ 'hostname', 'port' ],
   'hostname': {
     '#type': 'string',
     '#default': '127.0.0.1'
@@ -18,7 +16,8 @@ MyFunc.options = boptions( {
     '#min': 1024,
     '#max': 65535,
     '#default': 31337
-  }
+  },
+  'encoding': 'ascii'
 })
 
 function MyFunc () {
@@ -26,11 +25,20 @@ function MyFunc () {
   // options now contains safe, validated options!
 }
 
-MyFunc.options()
-// { hostname: '127.0.0.1', port: 31337 }
+deepEqual( )
+  MyFunc.options(),
+  { hostname: '127.0.0.1', port: 31337, encoding: 'ascii' }
+)
 
-MyFunc.options( 'example.com', 2222 )
-// { hostname: 'example.com', port: 2222 }
+deepEqual(
+  MyFunc.options( 'example.com', 2222 ),
+  { hostname: 'example.com', port: 2222, encoding: 'ascii' }
+)
+
+deepEqual(
+  MyFunc.options( { hostname: '10.10.10.10' }, { encoding: 'utf8' } ),
+  { hostname: '10.10.10.10', port: 2222, encoding: 'utf8' }
+)
 
 MyFunc.options( 0 )
 // throws ArgumentError -> 'Option port must be in range 1024-65535'
