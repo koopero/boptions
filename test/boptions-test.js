@@ -16,7 +16,7 @@ describe('boptions', function () {
   it('will parse some options', function () {
     const parser = boptions( {
       foo: {
-        '#type': 'string' 
+        '#type': 'string'
       }
     } )
 
@@ -25,4 +25,17 @@ describe('boptions', function () {
     assert.isObject( result )
     assert.deepEqual( result, { foo: 'bar' } )
   })
+
+  it('will add some defaults', function () {
+    const parser = boptions( {
+      foo: {
+        '#type': 'string',
+        "#default": 'bar'
+      }
+    } )
+
+    const result = parser()
+    assert.deepEqual( result, { foo: 'bar' } )
+  })
+
 })

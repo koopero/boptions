@@ -1,7 +1,7 @@
 module.exports = boptions
 
 const _ = require('lodash')
-    , funhash = require('funhash')
+    , metahash = require('metahash')
 
 function boptions() {
   //
@@ -22,11 +22,22 @@ function boptions() {
     }
   })
 
+  const definitions = {}
+  _.map( metahash.data( options ), function parseDefinition ( def, key ) {
 
-  const optionsSplit = funhash.split( options )
-      , directives = optionsSplit[0]
-      , definitions = optionsSplit[1]
-      , storeAll = !!directives['all']
+    if ( _.isObject( def ) ) {
+      definitions[key] = metahash.meta( def )
+    } else {
+      definitions[key] = {
+        'default': def
+      }
+    }
+
+  } )
+
+
+  const directives = metahash.meta( options )
+  const storeAll = !!directives['all']
 
   //
   // Here is the main options parser
@@ -83,6 +94,15 @@ function boptions() {
     })
 
     const result = {}
+    _.map( definitions, function eachDefinition ( def, key ) {
+      var value = argsObject[key]
+
+      if ( _.isUndefined( value ) ) {
+        value = def['default']
+      }
+
+      result[key] = value
+    })
 
     _.extend( result, argsObject )
     _.extend( result, leftovers )
