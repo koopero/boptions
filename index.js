@@ -11,6 +11,11 @@ function boptions() {
   //  First, walk through `arguments`, squishing objects into
   //  `options` and functions into `validators`
   //
+
+  function dieOnParserOptions( msg, key ) {
+    throw new ArgumentError( msg )
+  }
+
   const options = {}
       , validators = []
 
@@ -33,11 +38,31 @@ function boptions() {
       }
     }
 
+    definitions[key]['key'] = key
+
   } )
 
-
   const directives = metahash.meta( options )
-  const storeAll = !!directives['all']
+
+  if ( _.isString( directives.inline ) )
+    directives.inline = directives.inline.split( ',' )
+
+  const inlines = _.map( directives.inline, function parseInline( def ) {
+    if ( _.isString( def ) ) {
+      const key = def
+      def = definitions[key]
+
+      if ( !def ) {
+        dieOnParserOptions( 'No key definition for #inline %s', key )
+      }
+    } else if ( _.isObject( def ) ) {
+      def = metahash.meta( def )
+    } else {
+      dieOnParserOptions( 'Invalid #inline %s', def )
+    }
+
+    return def
+  })
 
   //
   // Here is the main options parser
@@ -63,18 +88,25 @@ function boptions() {
     //  worth saving.
     //
     const argsObject = {}
-        , linearResults = {}
+        , inlineResults = {}
         , leftovers = {}
 
-    var linearIndex = 0
+    var inlineIndex = 0
 
     _.map( args, function eachArg ( arg ) {
+
+      var inline = inlines[ inlineIndex ]
+      if ( inlineMatches( inline, arg ) ) {
+        inlineResults[ inline['key'] ] = arg
+        inlineIndex ++
+      }
+
       // From henceforth, we'll consider arg to be an object
 
       // Which keys should we use?
       // If we need to store leftovers, we'll use arg's keys,
       // if not we're better to use the keys from definitions.
-      var keys = Object.keys( storeAll ? arg : definitions )
+      var keys = Object.keys( !!directives['all'] ? arg : definitions )
       keys.forEach( function eachKey ( key ) {
         const value = arg[key]
         const def = definitions[key]
@@ -93,6 +125,9 @@ function boptions() {
       })
     })
 
+    // @todo Check for conflicts between argsObject & inlineResults
+    _.extend( argsObject, inlineResults )
+
     const result = {}
     _.map( definitions, function eachDefinition ( def, key ) {
       var value = argsObject[key]
@@ -104,11 +139,20 @@ function boptions() {
       result[key] = value
     })
 
-    _.extend( result, argsObject )
+
     _.extend( result, leftovers )
     return result
   }
 
   // That's all, folks!
   return parser
+}
+
+
+function inlineMatches( inline, arg ) {
+  if ( !inline )
+    return false
+
+  // @todo
+  return true
 }
