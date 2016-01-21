@@ -1,6 +1,6 @@
 {
   "name": "boptions",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Powerful options parser for functions",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "type": "git",
     "url": "https://github.com/koopero/boptions"
   },
-  "license": "MIT",
+  "license": "ISC",
   "bugs": "https://github.com/koopero/boptions/issues",
   "dependencies": {
     "lodash": "^4.0.0",

@@ -3,6 +3,8 @@ module.exports = boptions
 const _ = require('lodash')
     , metahash = require('metahash')
 
+_.extend( boptions, require('./src/presets' ) )
+
 function boptions() {
   //
   //  The options parser for the options parser generator...
