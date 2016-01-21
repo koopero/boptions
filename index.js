@@ -153,6 +153,34 @@ function inlineMatches( inline, arg ) {
   if ( !inline )
     return false
 
+  if ( !typeMatches( inline['type'], arg ) )
+    return false
+
   // @todo
+  return true
+}
+
+// #type
+function typeMatches( type, arg ) {
+  if ( _.isString( type ) ) {
+    switch ( type ) {
+      case 'string':
+        if ( !_.isString( arg ) )
+          return false
+      break
+
+      case 'float':
+      case 'number':
+      case 'int':
+        const num = parseInt( arg )
+        if ( isNaN( num ) )
+          return false
+      break
+
+      default:
+        return false
+    }
+  }
+
   return true
 }

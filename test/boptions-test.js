@@ -62,6 +62,27 @@ describe('boptions', function () {
           { 'hostname': 'example.com', 'port': 80 }
         )
       })
+
+      it('will parse out of order using #type', function () {
+        const parser = boptions( {
+          '#inline': [ 'hostname', 'port' ],
+          'hostname': {
+            '#type': 'string',
+            '#default': '127.0.0.1'
+          },
+          'port': {
+            '#type': 'int',
+            '#default': 25
+          }
+        })
+
+        assert.deepEqual(
+          parser( 25, 'localhost' ),
+          { 'hostname': 'localhost', 'port': 25 }
+        )
+
+      })
+
     })
   })
 })

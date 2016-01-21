@@ -1,6 +1,6 @@
 {
   "name": "boptions",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Powerful options parser for functions",
   "main": "index.js",
   "scripts": {
