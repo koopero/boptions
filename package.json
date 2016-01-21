@@ -1,0 +1,28 @@
+{
+  "name": "boptions",
+  "version": "0.1.0",
+  "description": "Powerful options parser for functions",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --check-leaks"
+  },
+  "author": "Samm Cooper <samm@sublight.ca>",
+  "keywords": [
+    "javascript",
+    "function",
+    "options",
+    "parser"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/koopero/boptions"
+  },
+  "license": "MIT",
+  "bugs": "https://github.com/koopero/boptions/issues",
+  "dependencies": {
+    "lodash": "^4.0.0"
+  },
+  "devDependencies": {
+    "chai": "^3.4.1"
+  }
+}
