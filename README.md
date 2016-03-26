@@ -44,7 +44,7 @@ MyFunc.options( 0 )
 // throws ArgumentError -> 'Option port must be in range 1024-65535'
 
 ```
-- Performance
+# Performance
 
 `boptions` is designed to be flexible, easy to use and thorough. Unfortunately,
 this comes at the cost of speed. I would *NOT* recommend using it for functions
