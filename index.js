@@ -4,6 +4,7 @@ const _ = require('lodash')
     , metahash = require('metahash')
 
 _.extend( boptions, require('./src/presets' ) )
+boptions.types = require('./src/types')
 
 function boptions() {
   //
@@ -14,8 +15,14 @@ function boptions() {
   //  `options` and functions into `validators`
   //
 
-  function dieOnParserOptions( msg, key ) {
-    throw new ArgumentError( msg )
+  function dieOnParserOptions( msg ) {
+    var argI = 1
+      , args = arguments
+
+    msg = msg.replace( /%s/g, function () {
+      return JSON.stringify( args[argI++] )
+    })
+    throw new Error( msg )
   }
 
   const options = {}
@@ -32,15 +39,39 @@ function boptions() {
   const definitions = {}
   _.map( metahash.data( options ), function parseDefinition ( def, key ) {
 
+    var def
     if ( _.isObject( def ) ) {
-      definitions[key] = metahash.meta( def )
+      def = metahash.meta( def )
     } else {
-      definitions[key] = {
+      def = {
         'default': def
       }
     }
 
-    definitions[key]['key'] = key
+    def['key'] = key
+
+    var type = def['type'] || 'any'
+
+    // Load type if it's a string
+    if ( _.isString( type ) ) {
+      if ( !boptions.types[type] )
+        dieOnParserOptions( 'Unknown type %s for key %s', type, key )
+      type = boptions.types[type]
+    }
+
+    // Make sure the type is an object...
+    if ( !_.isObject( type ) )
+      dieOnParserOptions( 'type for key %s is not an object', key )
+
+    // ... and has the correct methods.
+    ['match', 'merge', 'finalize'].map( function ( methodKey ) {
+      if ( !_.isFunction( type[methodKey] ) )
+        dieOnParserOptions( 'Method %s for type at key %s not found.', methodKey, key )
+    })
+
+    def['type'] = type
+
+    definitions[key] = def
 
   } )
 
@@ -118,7 +149,8 @@ function boptions() {
           return
 
         if ( def ) {
-          argsObject[key] = value
+          const type = def.type
+          argsObject[key] = type.merge( value, argsObject[key] )
         } else {
           // There's no definition for this key,
           // which means it's a leftover.
@@ -132,13 +164,15 @@ function boptions() {
 
     const result = {}
     _.map( definitions, function eachDefinition ( def, key ) {
+      const type = def['type']
       var value = argsObject[key]
+
 
       if ( _.isUndefined( value ) ) {
         value = def['default']
       }
 
-      value = typeApply( def['type'], value )
+      value = type.finalize( value )
 
       result[key] = value
     })
@@ -157,53 +191,9 @@ function inlineMatches( inline, arg ) {
   if ( !inline )
     return false
 
-  if ( !typeMatches( inline['type'], arg ) )
+  if ( !inline['type'].match( arg ) )
     return false
 
   // @todo
   return true
-}
-
-// #type
-function typeMatches( type, arg ) {
-  if ( _.isString( type ) ) {
-    switch ( type ) {
-      case 'string':
-        if ( !_.isString( arg ) )
-          return false
-      break
-
-      case 'float':
-      case 'number':
-      case 'int':
-        const num = parseInt( arg )
-        if ( isNaN( num ) )
-          return false
-      break
-
-      default:
-        return false
-    }
-  }
-
-  return true
-}
-
-function typeApply( type, arg ) {
-  if ( _.isString( type ) ) {
-    switch ( type ) {
-      case 'string':
-        return String( arg )
-      break
-
-      case 'float':
-      case 'number':
-        return parseFloat( arg )
-
-      case 'int':
-        return parseInt( arg )
-    }
-  }
-
-  return arg
 }

@@ -1,6 +1,6 @@
 {
   "name": "boptions",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Powerful options parser for functions",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,8 @@
   "bugs": "https://github.com/koopero/boptions/issues",
   "dependencies": {
     "lodash": "^4.0.0",
-    "metahash": "^1.0.0"
+    "metahash": "^1.0.0",
+    "require-dir": "^0.3.0"
   },
   "devDependencies": {
     "chai": "^3.4.1"

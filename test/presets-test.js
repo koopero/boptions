@@ -29,7 +29,7 @@ describe( 'presets', function () {
     it('will work as part of parser', function () {
       const parser = boptions({
         '#inline': [ 'a' ],
-        'a': boptions.integer
+        'a': boptions.numeric
       })
 
       deepEqual(
