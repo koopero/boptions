@@ -40,13 +40,29 @@ function boptions() {
   _.map( metahash.data( options ), function parseDefinition ( def, key ) {
 
     var def
-    if ( _.isObject( def ) ) {
-      def = metahash.meta( def )
-    } else {
-      def = {
-        'default': def
-      }
+      , type = typeof def
+
+    switch (type) {
+      case 'string':
+        if ( def[0] == '#' ) {
+          def = {
+            type: def.substr(1)
+          }
+          break
+        }
+        // Yer damn right it falls through. >:-)
+      case 'boolean':
+      case 'number':
+        def = {
+          type: type,
+          value: def
+        }
+      break
     }
+
+    // if ( _.isObject( def ) ) {
+    //   def = metahash.meta( def )
+    // }
 
     def['key'] = key
 
@@ -54,6 +70,7 @@ function boptions() {
 
     // Load type if it's a string
     if ( _.isString( type ) ) {
+      var typeName = type
       if ( !boptions.types[type] )
         dieOnParserOptions( 'Unknown type %s for key %s', type, key )
       type = boptions.types[type]
@@ -63,13 +80,13 @@ function boptions() {
     if ( !_.isObject( type ) )
       dieOnParserOptions( 'type for key %s is not an object', key )
 
-    // ... and has the correct methods.
-    ['match', 'merge', 'finalize'].map( function ( methodKey ) {
-      if ( !_.isFunction( type[methodKey] ) )
-        dieOnParserOptions( 'Method %s for type at key %s not found.', methodKey, key )
-    })
+    _.defaults( def, type );
 
-    def['type'] = type
+    // ... and has the correct methods.
+    // ['match', 'append', 'finalize'].map( function ( methodKey ) {
+    //   if ( !_.isFunction( def[methodKey] ) )
+    //     dieOnParserOptions( 'Method %s for defintion at key %s not found. '+(typeName||''), methodKey, key )
+    // })
 
     definitions[key] = def
 
@@ -88,8 +105,6 @@ function boptions() {
       if ( !def ) {
         dieOnParserOptions( 'No key definition for #inline %s', key )
       }
-    } else if ( _.isObject( def ) ) {
-      def = metahash.meta( def )
     } else {
       dieOnParserOptions( 'Invalid #inline %s', def )
     }
@@ -120,19 +135,61 @@ function boptions() {
     //  and put everything else in leftovers if it's
     //  worth saving.
     //
-    const argsObject = {}
-        , inlineResults = {}
+    const result = {}
+        // , argsObject = {}
+        // , inlineResults = {}
         , leftovers = {}
 
-    var inlineIndex = 0
 
+    //
+    // Apply defaults
+    //
+    _.map( definitions, function eachDefinition ( def, key ) {
+      var value = undefined
+
+      if ( !_.isUndefined( def.value ) )
+        value = _.clone( def.value )
+
+      result[key] = value
+    })
+
+
+    //
+    // Process inlines
+    //
+    var inlinesLocal = inlines.slice()
     _.map( args, function eachArg ( arg ) {
+      function set( key, value ) {
+        const def = definitions[key]
 
-      var inline = inlines[ inlineIndex ]
-      if ( inlineMatches( inline, arg ) ) {
-        inlineResults[ inline['key'] ] = arg
-        inlineIndex ++
+        // Ain't got time for no undefined
+        if ( _.isUndefined( value ) )
+          return
+
+        if ( def ) {
+          if ( def.append ) {
+            result[key] = def.append( result[key], value )
+          } else {
+            result[key] = value
+          }
+
+        } else {
+          // There's no definition for this key,
+          // which means it's a leftover.
+          leftovers[key] = value
+        }
       }
+
+      for ( var inlineIndex = 0; inlineIndex < inlinesLocal.length; inlineIndex ++ ) {
+        var inline = inlinesLocal[ inlineIndex ]
+        if ( inline && inline.match && inline.match( arg ) ) {
+          var def = inline
+          set( inline['key'], arg )
+          inlinesLocal.splice( inlineIndex, 1 )
+          return
+        }
+      }
+
 
       // From henceforth, we'll consider arg to be an object
 
@@ -142,37 +199,21 @@ function boptions() {
       var keys = Object.keys( !!directives['all'] ? arg : definitions )
       keys.forEach( function eachKey ( key ) {
         const value = arg[key]
-        const def = definitions[key]
-
-        // Ain't got time for no undefined
-        if ( _.isUndefined( value ) )
-          return
-
-        if ( def ) {
-          const type = def.type
-          argsObject[key] = type.merge( value, argsObject[key] )
-        } else {
-          // There's no definition for this key,
-          // which means it's a leftover.
-          leftovers[key] = value
-        }
+        set( key, value )
       })
+
+
     })
 
-    // @todo Check for conflicts between argsObject & inlineResults
-    _.extend( argsObject, inlineResults )
-
-    const result = {}
+    // Do the last of the work for definitions
     _.map( definitions, function eachDefinition ( def, key ) {
-      const type = def['type']
-      var value = argsObject[key]
+      var value = result[key]
 
+      if ( def.finalize )
+        value = def.finalize( value )
 
-      if ( _.isUndefined( value ) ) {
-        value = def['default']
-      }
-
-      value = type.finalize( value )
+      if ( def.validate )
+        def.validate( value )
 
       result[key] = value
     })
@@ -191,7 +232,7 @@ function inlineMatches( inline, arg ) {
   if ( !inline )
     return false
 
-  if ( !inline['type'].match( arg ) )
+  if ( !inline.match( arg ) )
     return false
 
   // @todo

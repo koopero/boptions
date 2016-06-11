@@ -4,9 +4,7 @@ describe('type:array',function() {
   it('match', function () {
     const parser = boptions({
       '#inline': ['a'],
-      'a': {
-        '#type': 'array'
-      }
+      'a': '#array'
     })
 
     const result = parser( [ 'foo' ] )

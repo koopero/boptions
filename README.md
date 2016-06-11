@@ -7,15 +7,12 @@ This module is under development. Check back later.
 ```js
 MyFunc.options = boptions( {
   '#inline': [ 'hostname', 'port' ],
-  'hostname': {
-    '#type': 'string',
-    '#default': '127.0.0.1'
-  },
+  'hostname': '127.0.0.1',
   'port': {
-    '#type': 'int',
-    '#min': 1024,
-    '#max': 65535,
-    '#default': 31337
+    'type': 'int',
+    'min': 1024,
+    'max': 65535,
+    'value': 31337
   },
   'encoding': 'ascii'
 })

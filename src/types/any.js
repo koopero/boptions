@@ -1,3 +1,3 @@
 exports.match = ( arg ) => true
-exports.merge = ( a, b ) => a
+exports.append = ( old, a ) => a
 exports.finalize = ( a, b ) => a

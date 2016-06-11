@@ -7,8 +7,8 @@ describe('definitions', function () {
     it('forces type', function () {
 
       const parser = boptions( {
-        'string': { '#type': 'string' },
-        'int':    { '#type': 'int' }
+        'string': '#string',
+        'int':    '#int'
       })
 
       assert.deepEqual(
@@ -22,8 +22,8 @@ describe('definitions', function () {
     it('will add some defaults', function () {
       const parser = boptions( {
         foo: {
-          '#type': 'string',
-          "#default": 'bar'
+          type: 'string',
+          value: 'bar'
         }
       } )
 

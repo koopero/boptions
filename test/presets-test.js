@@ -21,7 +21,7 @@ describe( 'presets', function () {
       presetEqual(
         boptions.integer,
         {
-          '#type': 'int'
+          'type': 'int'
         }
       )
     })

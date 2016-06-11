@@ -4,11 +4,11 @@ presets.integer = function() {
 
 }
 
-presets.integer['#type'] = 'int'
+presets.integer['type'] = 'int'
 
 
 presets.numeric = function() {
 
 }
 
-presets.numeric['#type'] = 'numeric'
+presets.numeric['type'] = 'numeric'

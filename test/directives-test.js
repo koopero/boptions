@@ -31,12 +31,12 @@ describe('directives', function () {
       const parser = boptions( {
         '#inline': [ 'hostname', 'port' ],
         'hostname': {
-          '#type': 'string',
-          '#default': '127.0.0.1'
+          type: 'string',
+          default: '127.0.0.1'
         },
         'port': {
-          '#type': 'int',
-          '#default': 25
+          type: 'int',
+          default: 25
         }
       })
 
@@ -55,10 +55,10 @@ describe('directives', function () {
       const parser = boptions( {
         '#inline': [ 'a', 'b' ],
         'a': {
-          '#type': 'string',
+          type: 'string',
         },
         'b': {
-          '#type': 'string',
+          type: 'string',
         }
       })
 

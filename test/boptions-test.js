@@ -15,9 +15,7 @@ describe('boptions', function () {
 
   it('will parse some options', function () {
     const parser = boptions( {
-      foo: {
-        '#type': 'string'
-      }
+      foo: '#string'
     } )
 
     const result = parser( { foo: 'bar'} )
