@@ -112,6 +112,16 @@ function boptions() {
     return def
   })
 
+  var leftovers = directives.leftovers
+  if ( leftovers ) {
+    if ( _.isString( leftovers ) ) {
+      if ( !definitions[leftovers] )
+        dieOnParserOptions( '#leftovers %s does not point to key.', leftovers )
+    } else if ( leftovers !== true ) {
+      dieOnParserOptions( 'Expected #leftovers to be string or boolean, got %s', leftovers )
+    }
+  }
+
   //
   // Here is the main options parser
   //
@@ -128,18 +138,7 @@ function boptions() {
       args = arguments
     }
 
-    //
-    //  First pass through arguments.
-    //  This will attempt to parse linear arguments,
-    //  squish all interesting keys into argsObject
-    //  and put everything else in leftovers if it's
-    //  worth saving.
-    //
     const result = {}
-        // , argsObject = {}
-        // , inlineResults = {}
-        , leftovers = {}
-
 
     //
     // Apply defaults
@@ -172,11 +171,17 @@ function boptions() {
           } else {
             result[key] = value
           }
-
-        } else {
+        } else if ( leftovers ) {
           // There's no definition for this key,
           // which means it's a leftover.
-          leftovers[key] = value
+
+          if ( _.isString( leftovers ) ) {
+            var wrap = {}
+            wrap[key] = value
+            set( leftovers, wrap )
+          } else {
+            result[key] = value
+          }
         }
       }
 
@@ -196,7 +201,7 @@ function boptions() {
       // Which keys should we use?
       // If we need to store leftovers, we'll use arg's keys,
       // if not we're better to use the keys from definitions.
-      var keys = Object.keys( !!directives['all'] ? arg : definitions )
+      var keys = Object.keys( !!directives['all'] || leftovers ? arg : definitions )
       keys.forEach( function eachKey ( key ) {
         const value = arg[key]
         set( key, value )
@@ -218,8 +223,6 @@ function boptions() {
       result[key] = value
     })
 
-
-    _.extend( result, leftovers )
     return result
   }
 
