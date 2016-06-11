@@ -49,6 +49,23 @@ describe('directives', function () {
         parser( 'localhost', 25 ),
         { 'hostname': 'localhost', 'port': 25 }
       )
+    })
+
+    it('will parse multiple values of same #type', function () {
+      const parser = boptions( {
+        '#inline': [ 'a', 'b' ],
+        'a': {
+          '#type': 'string',
+        },
+        'b': {
+          '#type': 'string',
+        }
+      })
+
+      assert.deepEqual(
+        parser( 'bar', 'foo' ),
+        { a: 'bar', b: 'foo' }
+      )
 
     })
 
