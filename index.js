@@ -198,15 +198,16 @@ function boptions() {
 
       // From henceforth, we'll consider arg to be an object
 
-      // Which keys should we use?
-      // If we need to store leftovers, we'll use arg's keys,
-      // if not we're better to use the keys from definitions.
-      var keys = Object.keys( !!directives['all'] || leftovers ? arg : definitions )
-      keys.forEach( function eachKey ( key ) {
-        const value = arg[key]
-        set( key, value )
-      })
-
+      if ( _.isObject( arg ) ) {
+        // Which keys should we use?
+        // If we need to store leftovers, we'll use arg's keys,
+        // if not we're better to use the keys from definitions.
+        var keys = Object.keys( !!directives['all'] || leftovers ? arg : definitions )
+        keys.forEach( function eachKey ( key ) {
+          const value = arg[key]
+          set( key, value )
+        })
+      }
 
     })
 
