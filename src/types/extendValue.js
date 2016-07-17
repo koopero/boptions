@@ -21,9 +21,16 @@ exports.append = function extendValueAppend( old, a ) {
   return _.extend( old, a )
 
   function wrap( value ) {
-    const valueKey = def.valueKey || 'value'
-        , wrap = {}
-    wrap[valueKey] = value
+    const valueKey = def.valueKey || ''
+
+    var wrap
+
+    if ( valueKey ) {
+      wrap = {}
+      wrap[valueKey] = value
+    } else {
+      wrap = value
+    }
 
     return wrap
   }
