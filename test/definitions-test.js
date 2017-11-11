@@ -8,7 +8,7 @@ describe('definitions', function () {
 
       const parser = boptions( {
         'string': '#string',
-        'int':    '#int'
+        'int':    '#integer'
       })
 
       assert.deepEqual(

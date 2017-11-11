@@ -4,7 +4,7 @@ const _ = require('lodash')
     , metahash = require('metahash')
 
 _.extend( boptions, require('./src/presets' ) )
-boptions.types = require('./src/types')
+boptions.types = require('./src/types/index')
 
 function boptions() {
   //
@@ -42,6 +42,9 @@ function boptions() {
     var def
       , type = typeof def
 
+    if ( def === null )
+      type = 'null'
+
     switch (type) {
       case 'string':
         if ( def[0] == '#' ) {
@@ -56,6 +59,13 @@ function boptions() {
         def = {
           type: type,
           value: def
+        }
+      break
+
+      case 'null':
+        def = {
+          type: 'any',
+          value: null
         }
       break
     }

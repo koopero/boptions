@@ -7,7 +7,7 @@ describe('type:array',function() {
       'a': '#array'
     })
 
-    const result = parser( [ 'foo' ] )
+    const result = parser( [ [ 'foo' ] ] )
 
   })
 })
