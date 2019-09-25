@@ -1,6 +1,6 @@
 {
   "name": "boptions",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Powerful options parser for functions",
   "main": "index.js",
   "scripts": {
@@ -24,6 +24,7 @@
     "metahash": "^1.0.0"
   },
   "devDependencies": {
-    "chai": "^3.5.0"
+    "chai": "^4.2.0",
+    "mocha": "^6.2.0"
   }
 }
